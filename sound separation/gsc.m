@@ -5,13 +5,13 @@ doa2 = -40 *pi/180;             %direction of arrival of second signal
 
 doa_steer = doa1;               %direction to steer the beamformer (original: doa1)
 
-d = 5;                          %distance between microphones in meters (original: 5)
+d = 4;                          %distance between microphones in meters (original: 4)
 
 M = 8;                          %number of microphones (original: 8)
 
                     %doa1   %doa2
-amp_out = 0.95;     %0.95   %0.85   %post-amplification for beamformer output
-mu = 0.001;         %0.001  %0.03   %adaptation rate
+amp_out = 0.95;     %0.95   %0.5   %post-amplification for beamformer output
+mu = 0.001;         %0.001  %0.05   %adaptation rate
 
 N = 200;                            %signal size in samples
 %%% simulating signals
@@ -20,7 +20,7 @@ c = 343;                        %speed of sound
 fs = N;                         %sampling frequency same as signal size (1 second)
 
 %original signals
-s1 = cos(2*pi*2.5*t);
+s1 = cos(2*pi*2*t);
 s2 = trianglewave(10,N)*0.5;
 
 figure(1);
@@ -29,8 +29,8 @@ plot(t,s1,t,s2)
 %microphones (input signals)
 X = zeros(M,N);
 X(1,:) = s1+s2;
-for m = 2:M
-    X(m,:) = delay_f(s1,(m*d/c)*sin(doa1),N)+delay_f(s2,(m*d/c)*sin(doa2),N);
+for m = 1:M-1
+    X(m+1,:) = delay_f(s1,(m*d/c)*sin(doa1),N)+delay_f(s2,(m*d/c)*sin(doa2),N);
 end
 
 figure(2);
@@ -40,8 +40,8 @@ plot(t,X(1,:))
 %%% doing GSC throughout time
 
 %applying the appropriate delays to input signals
-for m=2:M
-    X(m,:) = delay_f(X(m,:),-((m-1)*d/c)*sin(doa_steer),N);
+for m=1:M-1
+    X(m+1,:) = delay_f(X(m+1,:),-(m*d/c)*sin(doa_steer),N);
 end
 
 %calculating the upper part of GSC
@@ -52,7 +52,7 @@ x_n = zeros(M-1,N);
 for m=1:M-1
     x_n(m,:) = X(m+1,:)-X(m,:);
 end
-y_n = sum(x_n)/(M-1);
+y_n = sum(x_n);
 
 %applying beamformer
 Nw = 16;
@@ -67,14 +67,10 @@ for k = Nw:round(N)
 
     o(k) = this_y_u - this_y_n;
 
-    this_o = o(k-Nw+1:k);
-
     %updating filters
-
-    g = g + mu*(repmat(this_o,M-1,1).*this_x_n);
+    g = g + mu * o(k) * this_x_n;
 end
 
-%o = real(ifft(o_f));
 o = o*amp_out;
 
 figure(3);

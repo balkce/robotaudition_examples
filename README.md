@@ -13,7 +13,7 @@ For sound separation:
 * Principal Component Analysis (PCA), time and frequency variations
 * Independent Component Analysis (ICA), time and frequency variations
 * Non-negative Matrix Factorization (NNMF), time varaition and incomplete frequency variations (magnitude and by parts)
-* (INCOMPLETE) Geometric Source Separation (GEO_SS)
+* Phase-based frequency masking (PHASE)
 
 Should run in an Octave installation with the "signal" package installed.
 

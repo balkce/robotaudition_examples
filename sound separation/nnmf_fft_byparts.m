@@ -6,8 +6,8 @@ doa2 = -40 *pi/180;             %direction of arrival of second signal
 amp_out1 = 0.8;                 %pre-amplification of first signal
 amp_out2 = 1.2;                 %pre-amplification of second signal
 
-d = 5;                          %distance between microphones in meters
-M = 5;                          %number of microphones
+d = 4;                          %distance between microphones in meters
+M = 8;                          %number of microphones
 
 N = 200;                        %signal size in samples
 
@@ -19,17 +19,17 @@ c = 343;                        %speed of sound
 fs = N;                         %sampling frequency same as signal size (1 second)
 
 %original signals
-s1 = cos(2*pi*2.5*t);
+s1 = cos(2*pi*2*t);
 s2 = trianglewave(10,N)*0.5;
 
 %microphones (input signals)
 X_t = zeros(M,N);
 X_t(1,:) = s1+s2;
-for m = 2:M
+for m = 1:M-1
 	if(do_not_delay == 1)
-		X_t(m,:) = s1*amp_out1+s2*amp_out2;
+		X_t(m+1,:) = s1*amp_out1+s2*amp_out2;
 	else
-		X_t(m,:) = delay_f(s1,(m*d/c)*sin(doa1),N)+delay_f(s2,(m*d/c)*sin(doa2),N);
+		X_t(m+1,:) = delay_f(s1,(m*d/c)*sin(doa1),N)+delay_f(s2,(m*d/c)*sin(doa2),N);
 	end
 end
 

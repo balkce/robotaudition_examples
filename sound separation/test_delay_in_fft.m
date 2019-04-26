@@ -6,7 +6,7 @@ t = (1:N)/N;
 c = 343;
 fs = N;
 
-s1 = cos(2*pi*2.5*t);
+s1 = cos(2*pi*2*t);
 s1_d = delay_f(s1,(d/c)*sin(doa1),N);
 
 s1_f = fft(s1);
